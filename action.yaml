@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+---
+name: Markdown-to-Pages Action
+author: W Anders <w@doubleu.codes>
+description: Turn your README in to a two-file static site.
+inputs:
+  token:
+    required: true
+    description: A token is required to communicate with the Github API
+  file:
+    description: Markdown file to render
+    default: README.md
+  out-path:
+    description: Path the rendered files will be output to
+    default: dist
+  out-path-not-empty:
+    description: |
+      Set 'true' if the output path exists and is expected to already have content
+    default: 'false'
+  title:
+    description: |
+      Title of the path (default: username/repository)
+runs:
+  using: node16
+  main: dist/index.js
+branding:
+  icon: book
+  color: purple

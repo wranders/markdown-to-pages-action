@@ -1,0 +1,8 @@
+[*]
+end_of_line = lf
+charset = utf-8
+indent_style = space
+
+[{*.ts,*.pug,*.json,.eslintrc,.prettierrc}]
+indent_size = 2
+indent_style = space

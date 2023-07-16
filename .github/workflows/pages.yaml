@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow
+---
+name: Pages
+on:
+  workflow_dispatch:
+  push:
+    tags:
+    - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: wranders/markdown-to-pages-action@v0
+      with:
+        out-path: out
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - run: cp -r ./images/ ./out/images/
+    - uses: actions/upload-pages-artifact@v2
+      with:
+        path: out
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deplotment.outputs.page_url }}
+    steps:
+    - uses: actions/deploy-pages@v1
+      id: deployment

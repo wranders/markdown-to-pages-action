@@ -1,0 +1,108 @@
+doctype html
+html(data-color-mode="light" data-light-theme="light" data-dark-theme="dark"
+  lang="en-US"
+)
+  head
+    title #{title}
+    meta(charset='utf-8')
+    meta(http-equiv='Content-Type' content='text/html; charset=utf-8')
+    meta(name='viewport'
+      content='width=device-width,initial-scale=1,user-scalable=no'
+    )
+    if description 
+      meta(name="description" content=`${description}`)
+    if url
+      link(rel="canonical" href=`${url}`)
+
+    //- OpenGraph SEO
+    meta(property="og:title" content=`${title}`)
+    meta(property="og:type" content="website")
+    if url
+      meta(property="og:url" content=`${url}`)
+    if description 
+      meta(property="og:description" content=`${description}`)
+    meta(property="og:locale" content='en_US')
+    meta(property="og:site_name" content=`${title}`)
+
+    //- Twitter SEO
+    meta(name="twitter:card" content="summary")
+    meta(name="twitter:title" content=`${title}`)
+    if twitter.username 
+      meta(name="twitter:creator" content=`@${twitter.username}`)
+    if description
+      meta(name="twitter:description" content=`${description}`)
+
+    //- Github Icons
+    link(rel="alternate icon" class="js-site-favicon" type="image/png"
+      href="https://github.githubassets.com/favicons/favicon.png"
+      media="(prefers-color-scheme: light)"
+    )
+    link(rel="icon" class="js-site-favicon" type="image/svg+xml"
+      href="https://github.githubassets.com/favicons/favicon.svg"
+      media="(prefers-color-scheme: light)"
+    )
+    link(rel="alternate icon" class="js-site-favicon" type="image/png"
+      href="https://github.githubassets.com/favicons/favicon-dark.png"
+      media="(prefers-color-scheme: dark)"
+    )
+    link(rel="icon" class="js-site-favicon" type="image/svg+xml"
+      href="https://github.githubassets.com/favicons/favicon-dark.svg"
+      media="(prefers-color-scheme: dark)"
+    )
+    link(rel="mask-icon"
+      href="https://github.githubassets.com/pinned-octocat.svg" color="#000000"
+    )
+
+    link(href="index.css" rel="stylesheet")
+  body
+    div(class="container-lg px-3 my-5 markdown-body")
+      div(class="position-relative")
+        span(tabindex="0" aria-label="Toggle dark mode" aria-checked="true"
+          role="checkbox"
+          class="profile-color-modes-toggle js-promo-color-modes-toggle"
+        )
+          div(div class="profile-color-modes-toggle-track")
+          div(class="profile-color-modes-toggle-thumb")
+            svg(style="fill: var(--color-scale-yellow-0); margin: 7px 0 0 7px;"
+              aria-hidden="true" width="14" height="13" viewBox="0 0 14 13"
+              xmlns="http://www.w3.org/2000/svg"
+            )
+              path(fill-rule="evenodd" clip-rule="evenodd"
+                d="M4.52208 7.71754C7.5782 7.71754 10.0557 5.24006 10.0557 2.18394C10.0557 1.93498 10.0392 1.68986 10.0074 1.44961C9.95801 1.07727 10.3495 0.771159 10.6474 0.99992C12.1153 2.12716 13.0615 3.89999 13.0615 5.89383C13.0615 9.29958 10.3006 12.0605 6.89485 12.0605C3.95334 12.0605 1.49286 10.001 0.876728 7.24527C0.794841 6.87902 1.23668 6.65289 1.55321 6.85451C2.41106 7.40095 3.4296 7.71754 4.52208 7.71754Z"
+              )
+      script(type="text/javascript").
+        (function() {
+          var MODE_KEY = 'markdown_to_pages_dark_mode';
+          function toggleMode() {
+            var mode = document.documentElement.getAttribute('data-color-mode') === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-color-mode', mode);
+            localStorage.setItem(MODE_KEY, mode);
+          }
+          var mode = localStorage.getItem(MODE_KEY);
+          if (mode == null) {
+            var query = window.matchMedia('(prefers-color-scheme: dark)');
+            mode = query.matches ? 'dark' : 'light';
+          }
+          document.documentElement.setAttribute('data-color-mode', mode);
+          document.querySelector('.profile-color-modes-toggle').onclick = toggleMode;
+        })();
+      div !{content}
+
+    div(class="footer container-xl width-full p-responsive")
+      div(class="position-relative flex-row-reverse flex-lg-row flex-wrap flex-lg-nowrap flex-justify-center flex-lg-justify-between pt-4 pb-4 mt-6 f6 color-text-secondary border-top color-border-secondary text-center")
+        div(class="footer-octicon d-lg-block mx-lg-4")
+          a(title=`${repositoryName}` href=`${repositoryUrl}` target="_blank"
+            rel="noreferrer noopener"
+          )
+            svg(width="36" height="36" viewBox="0 0 98 98"
+              xmlns="http://www.w3.org/2000/svg"
+              class="octicon octicon-mark-github gh-logo"
+            )
+              path(fill-rule="evenodd" clip-rule="evenodd"
+                d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"
+              )
+        span(class="mt-2 d-block footprint")
+          span powered by 
+          a(href="https://github.com/wranders/markdown-to-pages-action"
+            target="_blank" rel="noreferrer noopener"
+          ) markdown-to-pages-action

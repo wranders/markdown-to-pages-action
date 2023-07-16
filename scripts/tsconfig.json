@@ -1,0 +1,15 @@
+{
+  "files": [
+    "bundle.ts",
+  ],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "strict": true,
+    "moduleResolution": "node",
+    "rootDir": ".",
+    "outDir": "./bin",
+    "lib": [ "ESNext" ],
+    "skipLibCheck": true
+  }
+}

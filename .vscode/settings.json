@@ -1,0 +1,13 @@
+{
+    "[typescript]": {
+      "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true,
+      },
+    },
+    "eslint.validate": [
+      "javascript"
+    ],
+    "markdownlint.ignore": [
+      "LICENSE"
+    ]
+  }
