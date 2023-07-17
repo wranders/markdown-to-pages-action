@@ -47,10 +47,10 @@ jobs:
     - uses: wranders/markdown-to-pages-action@v0.1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+    - run: cp ./images ./dist/images/
     - uses: actions/upload-pages-artifact@v2
       with:
         path: dist
-    - run: cp ./images ./dist/images/
 
   deploy:
     needs: build
