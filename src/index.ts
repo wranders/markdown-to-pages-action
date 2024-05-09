@@ -1,18 +1,23 @@
 import { debug, getInput, setFailed, setSecret } from '@actions/core';
+
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+
 import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  writeFileSync,
-} from 'fs';
-import { ClientRequest } from 'http';
-import { RequestOptions, request } from 'https';
-import { join, resolve } from 'path';
-import { LocalsObject, compile } from 'pug';
-import { format } from 'util';
+  FileToRender,
+  RenderedFile,
+  renderFiles,
+  renderNotFound,
+} from './render';
+import {
+  PagesInfo,
+  RepositoryInfo,
+  getPagesInfo,
+  getRepositoryInfo,
+} from './repo';
+import { OwnerSocial, getOwnerSocials, getTwitterHandle } from './social';
+
 import css from './imports/css';
-import html from './imports/html';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -20,208 +25,129 @@ declare global {
     interface ProcessEnv {
       GITHUB_REPOSITORY: string;
       GITHUB_SERVER_URL: string;
+      LOCAL_DEV: string;
     }
   }
 }
 
-type RepositoryInfo = {
-  name: string;
-  full_name: string;
-  description: string;
-  owner: {
-    login: string;
-  };
+type Inputs = {
+  files: string;
+  outPath: string;
+  outPathNotEmpty: boolean;
+  title: string;
+  token: string;
 };
 
-type PagesInfo = {
-  html_url: string;
-};
-
-type UserSocials = {
-  provider: string;
-  url: string;
-}[];
-
-async function requestApi(
-  opts: RequestOptions,
-  postData?: string,
-): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    const requestOptions: RequestOptions = {
-      ...opts,
-      headers: {
-        ...opts.headers,
-        'User-Agent': 'wranders/markdown-to-pages-action',
-      },
-      host: 'api.github.com',
-    };
-    let responseBody = '';
-    const req: ClientRequest = request(requestOptions, (response) => {
-      response.setEncoding('utf-8');
-      response.on('data', (chunk) => {
-        responseBody += chunk;
-      });
-      response.on('end', () => {
-        resolve(responseBody);
-      });
-      response.on('error', (err) => {
-        reject(err);
-      });
-    });
-    req.on('error', (err) => {
-      reject(err);
-    });
-    req.on('timeout', () => {
-      req.destroy();
-    });
-    if (requestOptions.method?.toUpperCase() === 'POST') req.write(postData);
-    req.end();
-  });
-}
-
-async function getRenderedMarkdown(
-  token: string,
-  markdown: string,
-): Promise<string> {
-  const data = JSON.stringify({
-    text: markdown,
-  });
-  const requestOptions: RequestOptions = {
-    method: 'POST',
-    path: '/markdown',
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: format('Bearer %s', token),
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(data),
-    },
+function getInputs(): Inputs {
+  return {
+    files: getInput('files'),
+    outPath: getInput('out_path'),
+    outPathNotEmpty: getInput('out_path_not_empty') === 'true',
+    title: getInput('title'),
+    token: getInput('token', { required: true }),
   };
-  const execRequest = await requestApi(requestOptions, data);
-  return execRequest;
 }
 
-async function getRepositoryInfo(
-  token: string,
-  repo: string,
-): Promise<RepositoryInfo> {
-  const requestOptions: RequestOptions = {
-    path: '/repos/' + repo,
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: format('Bearer %s', token),
-    },
-  };
-  const execRequest = await requestApi(requestOptions);
-  return JSON.parse(execRequest);
-}
-
-async function getPagesInfo(token: string, repo: string): Promise<PagesInfo> {
-  const requestOptions: RequestOptions = {
-    path: '/repos/' + repo + '/pages',
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: format('Bearer %s', token),
-    },
-  };
-  const execRequest = await requestApi(requestOptions);
-  return JSON.parse(execRequest);
-}
-
-async function getUserSocials(
-  token: string,
-  username: string,
-): Promise<UserSocials> {
-  const requestOptions: RequestOptions = {
-    path: '/users/' + username + '/social_accounts',
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: format('Bearer %s', token),
-    },
-  };
-  const execRequest = await requestApi(requestOptions);
-  return JSON.parse(execRequest);
-}
-
-function getTwitterHandle(socials: UserSocials): string | undefined {
-  const obj = socials.find((social) => social.provider === 'twitter');
-  if (obj === undefined) return undefined;
-  const match = obj.url.match(
-    /^https?:\/\/(www.)?twitter.com\/@?(?<handle>\w+)/,
-  );
-  return match?.groups?.handle;
-}
-
-function getTitle(repoName?: string): string {
-  const actionInput = getInput('title');
-  if (actionInput != '') return actionInput;
-  if (repoName !== undefined) return repoName;
-  return 'README';
-}
-
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   try {
-    const token = getInput('token', { required: true });
-    setSecret(token);
-    const outPath = getInput('out-path');
-    debug('out-path = ' + outPath);
-    const outPathFull = resolve(outPath);
-    debug('full out-path: ' + outPathFull);
-    const outPathNotEmpty =
-      getInput('out-path-not-empty') === 'true' ? true : false;
-    debug('out-path-not-empty: ' + outPathNotEmpty);
-    if (!outPathNotEmpty) {
-      if (existsSync(outPathFull) && readdirSync(outPathFull).length !== 0) {
-        // eslint-disable-next-line quotes
-        throw new Error("out_path '" + outPath + "' exists and is not empty");
+    // Gather inputs
+    const inputs = getInputs();
+    setSecret(inputs.token);
+    debug('inputs: ' + JSON.stringify(inputs));
+
+    // Resolve out path and check if existing files is permitted
+    inputs.outPath = resolve(inputs.outPath);
+    if (!inputs.outPathNotEmpty) {
+      if (
+        existsSync(inputs.outPath) &&
+        readdirSync(inputs.outPath).length !== 0
+      ) {
+        throw new Error(
+          `out_path '${inputs.outPath}' exists and is not empty.` +
+            // eslint-disable-next-line quotes
+            " set 'out_path_not_empty' to 'true' if needed.",
+        );
       }
-      mkdirSync(outPathFull, { recursive: true });
-      debug('out_path created');
+      mkdirSync(inputs.outPath, { recursive: true });
+      debug(`out_path '${inputs.outPath}' created`);
     }
 
-    const file = getInput('file');
-    debug('input file: ' + file);
-    const repoInfo: RepositoryInfo = await getRepositoryInfo(
-      token,
-      process.env.GITHUB_REPOSITORY,
-    );
-    const title = getTitle(repoInfo.full_name);
-    const pagesInfo: PagesInfo = await getPagesInfo(
-      token,
-      process.env.GITHUB_REPOSITORY,
-    );
+    // Check if files are provided. If not, default to README.md in root of repo
+    let files: string[] = inputs.files.split(/\r?\n/).filter((f) => f !== '');
+    if (files.length === 0) {
+      const root: string = resolve('.');
+      const readmes: string[] = readdirSync(root).filter((file) =>
+        // file.match(/readme/i),
+        /readme/i.exec(file),
+      );
+      if (readmes.length === 0) {
+        throw new Error('no files specified and no readme files found');
+      }
+      files = readmes;
+    }
 
-    const userSocials = await getUserSocials(token, repoInfo.owner.login);
-    const twitterHandle = getTwitterHandle(userSocials);
-
-    // Render HTML
-    const readmeContents = readFileSync(resolve(file), {
-      encoding: 'utf-8',
+    // Resolve paths of files and check if they exist
+    const filesToRender: FileToRender[] = [];
+    files.forEach((filename) => {
+      const absolute: string = resolve(filename);
+      if (!existsSync(absolute)) {
+        throw new Error(`file '${absolute}' does not exist`);
+      }
+      filesToRender.push({
+        path: filename,
+        aboslutePath: absolute,
+      });
     });
-    const markdownContents = await getRenderedMarkdown(token, readmeContents);
-    const htmlCompiler = compile(html);
-    const compilerLocals: LocalsObject = {
-      title: title,
-      content: markdownContents,
-      repositoryName: process.env.GITHUB_REPOSITORY,
-      repositoryUrl:
-        process.env.GITHUB_SERVER_URL + '/' + process.env.GITHUB_REPOSITORY,
-      description: repoInfo.description,
-      url: pagesInfo.html_url,
-      twitter: { username: twitterHandle },
-    };
-    debug(
-      'html compiler locals: ' +
-        JSON.stringify({ ...compilerLocals, content: '[RENDERED HTML]' }),
-    );
-    const htmlRendered = htmlCompiler(compilerLocals);
-    const htmlPath = join(outPathFull, 'index.html');
-    writeFileSync(htmlPath, htmlRendered);
-    debug(`html file written: ${htmlPath}`);
 
-    // Write CSS
-    const cssPath = join(outPathFull, 'index.css');
-    writeFileSync(cssPath, css);
-    debug(`css file written: ${cssPath}`);
+    // Gather repository info
+    const repoInfo: RepositoryInfo = await getRepositoryInfo(
+      inputs.token,
+      process.env.GITHUB_REPOSITORY,
+    );
+
+    // Gather repository Github Pages info
+    const pagesInfo: PagesInfo = await getPagesInfo(
+      inputs.token,
+      process.env.GITHUB_REPOSITORY,
+    );
+
+    // Check if user or organization has a Twitter/X profile linked
+    const ownerSocials: OwnerSocial[] = await getOwnerSocials(
+      inputs.token,
+      repoInfo.owner.login,
+    );
+    const twitterHandle: string | undefined = getTwitterHandle(ownerSocials);
+
+    // Render each file
+    const renderedFiles: RenderedFile[] = await renderFiles(
+      inputs.token,
+      inputs.title,
+      repoInfo,
+      pagesInfo,
+      filesToRender,
+      twitterHandle,
+    );
+
+    // Render custom 404
+    const renderedNotFound: RenderedFile = renderNotFound(
+      inputs.title,
+      repoInfo,
+      pagesInfo,
+      twitterHandle,
+    );
+
+    // Write each file
+    renderedFiles.forEach((file) => {
+      const fileOutDir: string = join(inputs.outPath, file.outPath);
+      if (!existsSync(fileOutDir)) {
+        mkdirSync(fileOutDir);
+      }
+      writeFileSync(join(fileOutDir, 'index.html'), file.contents);
+    });
+    writeFileSync(join(inputs.outPath, '404.html'), renderedNotFound.contents);
+
+    // Render and write CSS
+    writeFileSync(join(inputs.outPath, 'index.css'), css);
   } catch (e) {
     if (e instanceof Error) setFailed(e.message);
   }

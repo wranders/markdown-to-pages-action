@@ -12,7 +12,7 @@ async function main(): Promise<void> {
   })
     .replace(/`/g, '\\`')
     .replace(/\$/g, '\\$');
-  const fileContents = `const html = \`${htmlContents}\`;
+  const fileContents = `const html: string = \`${htmlContents}\`;
 export default html;
 `;
   const importsOutDir = join(srcDir, 'imports');
@@ -82,7 +82,7 @@ export default html;
   const compressedCssContents = compileString(cssContents, {
     style: 'compressed',
   }).css;
-  const cssTSContents = `const css = \`${compressedCssContents}\`;
+  const cssTSContents = `const css: string = \`${compressedCssContents}\`;
 export default css;
 `;
   writeFileSync(join(importsOutDir, 'css.ts'), cssTSContents);
