@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: wranders/markdown-to-pages-action@v0
+    - uses: ./
       with:
         out-path: out
         token: ${{ secrets.GITHUB_TOKEN }}

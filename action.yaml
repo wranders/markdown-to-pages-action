@@ -21,7 +21,7 @@ inputs:
     description: |
       Title of the path (default: username/repository)
 runs:
-  using: node16
+  using: node20
   main: dist/index.js
 branding:
   icon: book

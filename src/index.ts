@@ -145,15 +145,14 @@ async function getUserSocials(
 function getTwitterHandle(socials: UserSocials): string | undefined {
   const obj = socials.find((social) => social.provider === 'twitter');
   if (obj === undefined) return undefined;
-  const match = obj.url.match(
-    /^https?:\/\/(www.)?twitter.com\/@?(?<handle>\w+)/,
-  );
+  const re = /^https?:\/\/(www.)?(twitter|x).com\/@?(?<handle>\w+)/;
+  const match = re.exec(obj.url);
   return match?.groups?.handle;
 }
 
 function getTitle(repoName?: string): string {
   const actionInput = getInput('title');
-  if (actionInput != '') return actionInput;
+  if (actionInput !== '') return actionInput;
   if (repoName !== undefined) return repoName;
   return 'README';
 }
@@ -166,8 +165,7 @@ async function main(): Promise<void> {
     debug('out-path = ' + outPath);
     const outPathFull = resolve(outPath);
     debug('full out-path: ' + outPathFull);
-    const outPathNotEmpty =
-      getInput('out-path-not-empty') === 'true' ? true : false;
+    const outPathNotEmpty = getInput('out-path-not-empty') === 'true';
     debug('out-path-not-empty: ' + outPathNotEmpty);
     if (!outPathNotEmpty) {
       if (existsSync(outPathFull) && readdirSync(outPathFull).length !== 0) {
