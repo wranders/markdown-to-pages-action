@@ -7,6 +7,7 @@ import { PagesInfo, RepositoryInfo } from './repo';
 import { apiPost } from './request';
 
 import html from './imports/html';
+import { debug } from '@actions/core';
 
 export type FileToRender = {
   path: string;
@@ -66,17 +67,22 @@ function replaceMarkdownLinks(
   markdown: string,
   markdownFilePath: string,
 ): string {
+  debug(`replaceMarkdownLinks; markdownFilePath: ${markdownFilePath}`);
   let out: string = markdown;
   const root: string = resolve('.');
-  const linkMatches = [...out.matchAll(reMarkdownLinkLocal)];
+  debug(`replaceMarkdownLinks; root: ${root}`);
+  const linkMatches: RegExpExecArray[] = [...out.matchAll(reMarkdownLinkLocal)];
   for (const match of linkMatches) {
+    debug(`replaceMarkdownLinks; match: ${match[0]}`);
     if (match.groups === undefined) continue;
     const linkAbs: string = resolve(
       join(dirname(markdownFilePath), match.groups['filepath']),
     );
+    debug(`replaceMarkdownLinks; linkAbs: ${linkAbs}`);
     if (!filesToRender.some((f) => f.aboslutePath === linkAbs)) continue;
-    const linkTitle = match.groups['title'];
+    const linkTitle: string = match.groups['title'];
     const linkDir: string = dirname(linkAbs).replace(root, '');
+    debug(`replaceMarkdownLinks; new link: [${linkTitle}](${linkDir})`);
     out = out.replaceAll(match[0], `[${linkTitle}](${linkDir})`);
   }
   return out;
