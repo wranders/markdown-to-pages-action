@@ -87,13 +87,17 @@ function replaceMarkdownLinks(
   return out;
 }
 
-function generateBreadcrumbs(path: string): string {
+function generateBreadcrumbs(path: string, pagesInfo: PagesInfo): string {
   let out: string = '';
   const pathElements: string[] = dirname(path)
     .split(sep)
     .filter((p) => p !== '.');
   if (pathElements.length > 0) {
-    out = '<a href="/">home</a>';
+    if (process.env.LOCAL_DEV === undefined) {
+      out = `<a href="${pagesInfo.html_url}">home</a>`;
+    } else {
+      out = '<a href="/">home</a>';
+    }
     pathElements.forEach((value, index, array) => {
       if (index === array.length - 1) {
         out += ` > ${value}`;
@@ -129,7 +133,10 @@ export async function renderFiles(
       token,
       fileContents,
     );
-    const breadcrumbs: string = generateBreadcrumbs(fileToRender.path);
+    const breadcrumbs: string = generateBreadcrumbs(
+      fileToRender.path,
+      pagesInfo,
+    );
     let pageTitle: string = title.length > 0 ? title : repoInfo.full_name;
     const titleSuffix: string = dirname(fileToRender.path).replace(/^\.\//, '');
     if (titleSuffix !== '.') {
