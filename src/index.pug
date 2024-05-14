@@ -53,10 +53,15 @@ html(data-color-mode="light" data-light-theme="light" data-dark-theme="dark"
       href="https://github.githubassets.com/pinned-octocat.svg" color="#000000"
     )
 
-    link(href="index.css" rel="stylesheet")
+    if localDev
+      link(href="/index.css" rel="stylesheet")
+    else
+      link(href=locals.url + "index.css" rel="stylesheet")
   body
     div(class="container-lg px-3 my-5 markdown-body")
       div(class="position-relative")
+        if breadcrumbs.length > 0
+          span !{breadcrumbs}
         span(tabindex="0" aria-label="Toggle dark mode" aria-checked="true"
           role="checkbox"
           class="profile-color-modes-toggle js-promo-color-modes-toggle"

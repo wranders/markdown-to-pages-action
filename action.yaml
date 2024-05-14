@@ -7,13 +7,13 @@ inputs:
   token:
     required: true
     description: A token is required to communicate with the Github API
-  file:
-    description: Markdown file to render
+  files:
+    description: Markdown files to render
     default: README.md
-  out-path:
+  out_path:
     description: Path the rendered files will be output to
     default: dist
-  out-path-not-empty:
+  out_path_not_empty:
     description: |
       Set 'true' if the output path exists and is expected to already have content
     default: 'false'

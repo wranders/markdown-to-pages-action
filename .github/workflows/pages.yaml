@@ -10,15 +10,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ./
       with:
-        out-path: out
+        out_path: out
         token: ${{ secrets.GITHUB_TOKEN }}
     - run: cp -r ./images/ ./out/images/
-    - uses: actions/upload-pages-artifact@v2
+    - uses: actions/upload-pages-artifact@v3
       with:
         path: out
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -29,5 +30,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-    - uses: actions/deploy-pages@v1
+    - uses: actions/deploy-pages@v4
       id: deployment

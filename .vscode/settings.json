@@ -9,5 +9,6 @@
     ],
     "markdownlint.ignore": [
       "LICENSE"
-    ]
+    ],
+    "liveServer.settings.root": "/out"
   }
