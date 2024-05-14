@@ -102,7 +102,11 @@ function generateBreadcrumbs(path: string, pagesInfo: PagesInfo): string {
       if (index === array.length - 1) {
         out += ` > ${value}`;
       } else {
-        out += ` > <a href="/${array.slice(0, index + 1).join(sep)}/">${value}</a>`;
+        let href: string = `/${array.slice(0, index + 1).join(sep)}/`;
+        if (process.env.LOCAL_DEV === undefined) {
+          href = new URL(href.replace('/', ''), pagesInfo.html_url).href;
+        }
+        out += ` > <a href="${href}">${value}</a>`;
       }
     });
   }
