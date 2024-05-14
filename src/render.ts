@@ -66,6 +66,7 @@ function replaceMarkdownLinks(
   filesToRender: FileToRender[],
   markdown: string,
   markdownFilePath: string,
+  pagesInfo: PagesInfo,
 ): string {
   let out: string = markdown;
   const root: string = resolve('.');
@@ -77,7 +78,10 @@ function replaceMarkdownLinks(
     );
     if (!filesToRender.some((f) => f.aboslutePath === linkAbs)) continue;
     const linkTitle: string = match.groups['title'];
-    const linkDir: string = dirname(linkAbs).replace(root, '');
+    let linkDir: string = dirname(linkAbs).replace(root, '');
+    if (process.env.LOCAL_DEV === undefined) {
+      linkDir = pagesInfo.html_url + linkDir.replace('/', '');
+    }
     out = out.replaceAll(match[0], `[${linkTitle}](${linkDir})`);
   }
   return out;
