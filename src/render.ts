@@ -80,7 +80,7 @@ function replaceMarkdownLinks(
     const linkTitle: string = match.groups['title'];
     let linkDir: string = dirname(linkAbs).replace(root, '');
     if (process.env.LOCAL_DEV === undefined) {
-      linkDir = join(pagesInfo.html_url, linkDir);
+      linkDir = new URL(linkDir.replace('/', ''), pagesInfo.html_url).href;
     }
     out = out.replaceAll(match[0], `[${linkTitle}](${linkDir})`);
   }
