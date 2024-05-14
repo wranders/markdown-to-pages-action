@@ -79,7 +79,7 @@ function replaceMarkdownLinks(
     if (!filesToRender.some((f) => f.aboslutePath === linkAbs)) continue;
     const linkTitle: string = match.groups['title'];
     let linkDir: string = dirname(linkAbs).replace(root, '');
-    if (process.env.LOCAL_DEV !== undefined) {
+    if (process.env.LOCAL_DEV === undefined) {
       linkDir = join(pagesInfo.html_url, linkDir);
     }
     out = out.replaceAll(match[0], `[${linkTitle}](${linkDir})`);
@@ -123,6 +123,7 @@ export async function renderFiles(
       filesToRender,
       fileContents,
       fileToRender.aboslutePath,
+      pagesInfo,
     );
     const renderedMarkdown: string = await getRenderedMarkdown(
       token,
