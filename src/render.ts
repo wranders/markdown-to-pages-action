@@ -7,7 +7,6 @@ import { PagesInfo, RepositoryInfo } from './repo';
 import { apiPost } from './request';
 
 import html from './imports/html';
-import { debug } from '@actions/core';
 
 export type FileToRender = {
   path: string;
