@@ -140,7 +140,7 @@ export async function main(): Promise<void> {
     renderedFiles.forEach((file) => {
       const fileOutDir: string = join(inputs.outPath, file.outPath);
       if (!existsSync(fileOutDir)) {
-        mkdirSync(fileOutDir);
+        mkdirSync(fileOutDir, { recursive: true });
       }
       writeFileSync(join(fileOutDir, 'index.html'), file.contents);
     });
