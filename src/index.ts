@@ -1,4 +1,4 @@
-import { debug, getInput, setFailed, setSecret } from '@actions/core';
+import { debug, getInput, info, setFailed, setSecret } from '@actions/core';
 
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -57,20 +57,26 @@ export async function main(): Promise<void> {
 
     // Resolve out path and check if existing files is permitted
     inputs.outPath = resolve(inputs.outPath);
+    const outExists: boolean = existsSync(inputs.outPath);
     if (!inputs.outPathNotEmpty) {
-      if (
-        existsSync(inputs.outPath) &&
-        readdirSync(inputs.outPath).length !== 0
-      ) {
+      if (outExists && readdirSync(inputs.outPath).length !== 0) {
         throw new Error(
           `out_path '${inputs.outPath}' exists and is not empty.` +
             // eslint-disable-next-line quotes
             " set 'out_path_not_empty' to 'true' if needed.",
         );
       }
-      mkdirSync(inputs.outPath, { recursive: true });
-      debug(`out_path '${inputs.outPath}' created`);
     }
+    if (!outExists && inputs.outPathNotEmpty) {
+      info(
+        `out_path (${inputs.outPath}) does not exist ` +
+          'and out_path_not_empty is "true". ' +
+          'was this expected to exist? ' +
+          'creating out_path anyway...',
+      );
+    }
+    mkdirSync(inputs.outPath, { recursive: true });
+    debug(`out_path '${inputs.outPath}' created`);
 
     // Check if files are provided. If not, default to README.md in root of repo
     let files: string[] = inputs.files.split(/\r?\n/).filter((f) => f !== '');
