@@ -2,7 +2,7 @@
 ---
 name: Markdown-to-Pages Action
 author: W Anders <w@doubleu.codes>
-description: Turn your README in to a two-file static site.
+description: Turn your README(s) into a basic static site.
 inputs:
   token:
     required: true
