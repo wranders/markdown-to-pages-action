@@ -7,6 +7,7 @@ import { PagesInfo, RepositoryInfo } from './repo';
 import { apiPost } from './request';
 
 import html from './imports/html';
+import { debug } from '@actions/core';
 
 export type FileToRender = {
   path: string;
@@ -86,7 +87,11 @@ function replaceMarkdownLinks(
   return out;
 }
 
-function generateBreadcrumbs(path: string, pagesInfo: PagesInfo): string {
+function generateBreadcrumbs(
+  path: string,
+  pagesInfo: PagesInfo,
+  filesToRender: FileToRender[],
+): string {
   let out: string = '';
   const pathElements: string[] = dirname(path)
     .split(sep)
@@ -97,11 +102,16 @@ function generateBreadcrumbs(path: string, pagesInfo: PagesInfo): string {
     } else {
       out = '<a href="/">home</a>';
     }
+    const root = resolve('.');
     pathElements.forEach((value, index, array) => {
-      if (index === array.length - 1) {
+      const name: string = array.slice(0, index + 1).join(sep);
+      const isRendered: boolean = filesToRender.some(
+        (f) => dirname(f.aboslutePath) === join(root, name),
+      );
+      if (!isRendered || index === array.length - 1) {
         out += ` > ${value}`;
       } else {
-        let href: string = `/${array.slice(0, index + 1).join(sep)}/`;
+        let href: string = `/${name}/`;
         if (process.env.LOCAL_DEV === undefined) {
           href = new URL(href.replace('/', ''), pagesInfo.html_url).href;
         }
@@ -139,6 +149,7 @@ export async function renderFiles(
     const breadcrumbs: string = generateBreadcrumbs(
       fileToRender.path,
       pagesInfo,
+      filesToRender,
     );
     let pageTitle: string = title.length > 0 ? title : repoInfo.full_name;
     const titleSuffix: string = dirname(fileToRender.path).replace(/^\.\//, '');
