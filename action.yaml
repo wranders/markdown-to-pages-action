@@ -7,6 +7,8 @@ inputs:
   token:
     required: true
     description: A token is required to communicate with the Github API
+  custom_css:
+    description: Path to a custom CSS file to override Github styles.
   files:
     description: Markdown files to render
     default: README.md
