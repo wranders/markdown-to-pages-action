@@ -1,6 +1,6 @@
 {
   "name": "markdown-to-pages-action",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Turn your README(s) into a basic static site using Github Actions",
   "homepage": "https://www.doubleu.codes/markdown-to-pages-action",
   "bugs": {
@@ -14,15 +14,21 @@
     "url": "https://github.com/wranders/markdown-to-pages-action"
   },
   "scripts": {
-    "clean:dist": "node -e \"require('fs').rm('dist',{recursive:true,force:true},()=>{});\"",
-    "clean:lib": "node -e \"require('fs').rm('lib',{recursive:true,force:true},()=>{});\"",
-    "clean:scripts": "node -e \"require('fs').rm('scripts/bin',{recursive:true,force:true},()=>{});\"",
-    "clean:imports": "node -e \"require('fs').rm('src/imports',{recursive:true,force:true},()=>{});\"",
-    "clean": "npm run clean:dist && npm run clean:lib && npm run clean:scripts && npm run clean:imports",
+    "clean:artifact": "node -e \"require('fs').rmSync('artifact',{recursive:true,force:true});\"",
+    "clean:dist": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true});\"",
+    "clean:lib": "node -e \"require('fs').rmSync('lib',{recursive:true,force:true});\"",
+    "clean:local_dev": "node -e \"require('fs').rmSync('local_dev',{recursive:true,force:true});\"",
+    "clean:out": "node -e \"require('fs').rmSync('out',{recursive:true,force:true});\"",
+    "clean:scripts": "node -e \"require('fs').rmSync('scripts/bin',{recursive:true,force:true});\"",
+    "clean:imports": "node -e \"require('fs').rmSync('src/imports',{recursive:true,force:true});\"",
+    "clean": "npm run clean:artifact && npm run clean:dist && npm run clean:lib && npm run clean:local_dev && npm run clean:out && npm run clean:scripts && npm run clean:imports",
     "prebuild": "npm run clean && tsc --project scripts && node scripts/bin/bundle.js",
     "build": "tsc",
     "prepackage": "npm run build",
-    "package": "ncc build --minify --license licenses.txt"
+    "package": "ncc build --minify --license licenses.txt",
+    "preact": "npm run package && node -e \"require('node:fs').mkdirSync('local_dev');\"",
+    "act": "act --rm --job=build --actor=wranders/local_dev --env-file=act/.env --secret=GITHUB_TOKEN=\"$(gh auth token)\" --artifact-server-path=artifact --container-options=\"-v ./local_dev:/local_dev:Z\""
+    
   },
   "dependencies": {
     "@actions/core": "^1.10.1",

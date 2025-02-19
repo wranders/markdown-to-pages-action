@@ -10,5 +10,5 @@
     "markdownlint.ignore": [
       "LICENSE"
     ],
-    "liveServer.settings.root": "/out"
+    "liveServer.settings.root": "/local_dev"
   }

@@ -1,4 +1,4 @@
+artifact
 node_modules
 lib
-out
-.env
+local_dev
