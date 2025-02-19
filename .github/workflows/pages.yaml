@@ -20,6 +20,7 @@ jobs:
           test/nested/twice/README.md
         out_path: out
         token: ${{ secrets.GITHUB_TOKEN }}
+        custom_css: test/custom.css
     - run: cp -r ./images/ ./out/images/
     - uses: actions/upload-pages-artifact@v3
       with:

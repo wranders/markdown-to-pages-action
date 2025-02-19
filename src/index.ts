@@ -173,10 +173,12 @@ export async function main(): Promise<void> {
     writeFileSync(join(inputs.outPath, 'index.css'), css);
 
     // Copy custom CSS file to output
-    copyFileSync(
-      join(root, inputs.customCSS),
-      join(inputs.outPath, 'custom.css'),
-    );
+    if (inputs.customCSS.length !== 0) {
+      copyFileSync(
+        join(root, inputs.customCSS),
+        join(inputs.outPath, 'custom.css'),
+      );
+    }
   } catch (e) {
     if (e instanceof Error) setFailed(e.message);
   }
