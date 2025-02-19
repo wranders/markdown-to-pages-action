@@ -17,6 +17,10 @@ which file should be that directory's `index.html`.
 
 **Required:** A token is required to communicate with the Github API
 
+### `custom_css`
+
+Path to a custom CSS file to override Github styles.
+
 ### `files`
 
 Markdown files to render (*default: ***ROOT `README.md`****). Delimit multiple
@@ -93,7 +97,15 @@ a larger stylesheet, though this may be addressed in a later release.
 
 ## Multi-page Demo
 
-Here is a link to [`test/README.md`](./test/README.md). Here's another link to
-[`test/nested/readme.md`](./test/nested/readme.md). Here's a deeply nested link
-to [`test/nested/twice/README.md`](./test/nested/twice/README.md). This shows
+Here is a link to [test/README.md](./test/README.md). Here's another link to
+[test/nested/readme.md](./test/nested/readme.md). Here's a deeply nested link
+to [test/nested/twice/README.md](./test/nested/twice/README.md). This shows
 how multiple pages will be handled.
+
+## Custom CSS Demo
+
+A custom CSS file is supported throught the [custom_css](#custom_css) option.
+In this example, the background color of code blocks within links is changed on
+hover.
+
+[`test link`]()

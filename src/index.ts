@@ -1,6 +1,12 @@
 import { debug, getInput, info, setFailed, setSecret } from '@actions/core';
 
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  writeFileSync,
+} from 'node:fs';
 import { join, resolve } from 'node:path';
 
 import {
@@ -31,6 +37,7 @@ declare global {
 }
 
 type Inputs = {
+  customCSS: string;
   files: string;
   outPath: string;
   outPathNotEmpty: boolean;
@@ -40,6 +47,7 @@ type Inputs = {
 
 function getInputs(): Inputs {
   return {
+    customCSS: getInput('custom_css'),
     files: getInput('files'),
     outPath: getInput('out_path'),
     outPathNotEmpty: getInput('out_path_not_empty') === 'true',
@@ -78,10 +86,11 @@ export async function main(): Promise<void> {
     mkdirSync(inputs.outPath, { recursive: true });
     debug(`out_path '${inputs.outPath}' created`);
 
+    const root: string = resolve('.');
+
     // Check if files are provided. If not, default to README.md in root of repo
     let files: string[] = inputs.files.split(/\r?\n/).filter((f) => f !== '');
     if (files.length === 0) {
-      const root: string = resolve('.');
       const readmes: string[] = readdirSync(root).filter((file) =>
         // file.match(/readme/i),
         /readme/i.exec(file),
@@ -104,6 +113,13 @@ export async function main(): Promise<void> {
         aboslutePath: absolute,
       });
     });
+
+    if (inputs.customCSS.length !== 0) {
+      const file: string = join(root, inputs.customCSS);
+      if (!existsSync(file)) {
+        throw new Error(`custom css file '${file}' does not exist`);
+      }
+    }
 
     // Gather repository info
     const repoInfo: RepositoryInfo = await getRepositoryInfo(
@@ -132,6 +148,7 @@ export async function main(): Promise<void> {
       pagesInfo,
       filesToRender,
       twitterHandle,
+      inputs.customCSS,
     );
 
     // Render custom 404
@@ -154,6 +171,14 @@ export async function main(): Promise<void> {
 
     // Render and write CSS
     writeFileSync(join(inputs.outPath, 'index.css'), css);
+
+    // Copy custom CSS file to output
+    if (inputs.customCSS.length !== 0) {
+      copyFileSync(
+        join(root, inputs.customCSS),
+        join(inputs.outPath, 'custom.css'),
+      );
+    }
   } catch (e) {
     if (e instanceof Error) setFailed(e.message);
   }

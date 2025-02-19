@@ -7,7 +7,6 @@ import { PagesInfo, RepositoryInfo } from './repo';
 import { apiPost } from './request';
 
 import html from './imports/html';
-import { debug } from '@actions/core';
 
 export type FileToRender = {
   path: string;
@@ -26,6 +25,7 @@ type HTML = {
   url: string;
   twitterUsername?: string;
   breadcrumbs: string;
+  customCSS?: string;
 };
 
 async function getRenderedMarkdown(
@@ -54,6 +54,7 @@ function renderHTML(htmlConfig: HTML): string {
     },
     breadcrumbs: htmlConfig.breadcrumbs,
     localDev: process.env.LOCAL_DEV,
+    customCSS: htmlConfig.customCSS,
   };
   const compiler = compile(html);
   return compiler(locals);
@@ -129,6 +130,7 @@ export async function renderFiles(
   pagesInfo: PagesInfo,
   filesToRender: FileToRender[],
   twitterHandle?: string,
+  customCSS?: string,
 ): Promise<RenderedFile[]> {
   const renderedFiles: RenderedFile[] = [];
 
@@ -163,6 +165,7 @@ export async function renderFiles(
       url: pagesInfo.html_url,
       twitterUsername: twitterHandle,
       breadcrumbs: breadcrumbs,
+      customCSS: customCSS,
     };
     const renderedHTML: string = renderHTML(htmlConfig);
     renderedFiles.push({
