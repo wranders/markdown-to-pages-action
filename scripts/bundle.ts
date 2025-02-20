@@ -53,6 +53,7 @@ export default html;
   position: absolute;
   top: 12px;
   right: 0;
+  z-index: 1;
 }
 .profile-color-modes-toggle-track {
   width:42px;
