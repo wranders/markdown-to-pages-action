@@ -25,6 +25,14 @@ jobs:
     - uses: actions/upload-pages-artifact@v3
       with:
         path: out
+    - uses: actions/download-artifact@v4
+      if: github.actor == 'wranders/local_dev'
+      with:
+        name: github-pages
+        path: /local_dev
+    - run: tar -C /local_dev -xvf /local_dev/artifact.tar
+      if: github.actor == 'wranders/local_dev'
+
 
   deploy:
     needs: build

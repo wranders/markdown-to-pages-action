@@ -50,9 +50,10 @@ export default html;
   a { opacity: 1; }
 }
 .profile-color-modes-toggle {
-	position: absolute;
-	top: 12px;
-	right: 0;
+  position: absolute;
+  top: 12px;
+  right: 0;
+  z-index: 1;
 }
 .profile-color-modes-toggle-track {
   width:42px;
@@ -62,16 +63,35 @@ export default html;
   background-color:var(--color-profile-color-modes-toggle-track-bg)
 }
 .profile-color-modes-toggle-thumb {
-	position: absolute;
-	top: -2px;
-	left: -2px;
-	width: 28px;
-	height: 28px;
-	border-radius: 50%;
-	background-color: var(--color-profile-color-modes-toggle-thumb-bg);
-	transition: transform .3s cubic-bezier(.4,.03,0,1);
-	cursor: pointer;
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--color-profile-color-modes-toggle-thumb-bg);
+  transition: transform .3s cubic-bezier(.4,.03,0,1);
+  cursor: pointer;
 }
+.markdown-heading { position: relative; }
+.markdown-heading .anchor {
+  float: left;
+  padding-right: 0.25rem;
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  left: -1.75rem;
+  display: flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: auto;
+  opacity: 0;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(-50%);
+  color: var(--color-fg-default)
+}
+.markdown-heading .anchor:hover { opacity: 1; }
 `;
   const sassRender = compileString(sassContents, {
     loadPaths: ['node_modules'],

@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 
+import { JSDOM } from 'jsdom';
+import octicons from '@primer/octicons';
 import { LocalsObject, compile } from 'pug';
 
 import { PagesInfo, RepositoryInfo } from './repo';
@@ -168,8 +170,20 @@ export async function renderFiles(
       customCSS: customCSS,
     };
     const renderedHTML: string = renderHTML(htmlConfig);
+    const dom = new JSDOM(renderedHTML);
+    const mdHeadings =
+      dom.window.document.getElementsByClassName('markdown-heading');
+    for (const element of mdHeadings) {
+      for (const child of element.children) {
+        if (child.tagName !== 'A') {
+          continue;
+        }
+        child.id = child.id.replace('user-content-', '');
+        child.innerHTML = octicons.link.toSVG({ width: 16 });
+      }
+    }
     renderedFiles.push({
-      contents: renderedHTML,
+      contents: dom.serialize(),
       outPath: titleSuffix,
     });
   }
