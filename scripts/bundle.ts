@@ -31,18 +31,18 @@ export default html;
 @import '@primer/css/index.scss';
 [data-color-mode=dark][data-dark-theme*=dark] {
   ${githubSyntaxDarkContents}
-  .gh-logo { fill: #fff; }
+  .gh-logo { fill: #ffffff; }
   .profile-color-modes-toggle-thumb { transform: translateX(18px); }
-  --color-profile-color-modes-toggle-track-border: var(--color-scale-purple-8);
-  --color-profile-color-modes-toggle-track-bg: var(--color-scale-purple-9);
-  --color-profile-color-modes-toggle-thumb-bg: var(--color-scale-purple-6)
+  --color-profile-color-modes-toggle-track-border: #3c1e70;
+  --color-profile-color-modes-toggle-track-bg: #271052;
+  --color-profile-color-modes-toggle-thumb-bg: #6e40c9;
 }
 [data-color-mode=light][data-light-theme*=light] {
   ${githubSyntaxLightContents}
   .gh-logo { fill: #24292f; }
-  --color-profile-color-modes-toggle-track-border: var(--color-scale-gray-3);
-  --color-profile-color-modes-toggle-track-bg: var(--color-scale-white);
-  --color-profile-color-modes-toggle-thumb-bg: var(--color-scale-gray-8)
+  --color-profile-color-modes-toggle-track-border: #afb8c1;
+  --color-profile-color-modes-toggle-track-bg: #ffffff;
+  --color-profile-color-modes-toggle-thumb-bg: #32383f;
 }
 .gh-logo { opacity: .5; }
 .footer .footprint {
