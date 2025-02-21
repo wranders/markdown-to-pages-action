@@ -91,7 +91,9 @@ export default html;
   transform: translateY(-50%);
   color: var(--color-fg-default)
 }
-.markdown-heading .anchor:hover { opacity: 1; }
+.markdown-heading:hover {
+  .anchor { opacity: 1; }
+}
 `;
   const sassRender = compileString(sassContents, {
     loadPaths: ['node_modules'],
