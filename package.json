@@ -30,29 +30,29 @@
     "act": "act --rm --job=build --actor=wranders/local_dev --env-file=act/.env --secret=GITHUB_TOKEN=\"$(gh auth token)\" --artifact-server-path=artifact --container-options=\"-v ./local_dev:/local_dev:Z\""
   },
   "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@primer/css": "^21.5.1",
-    "@primer/octicons": "^19.15.0",
-    "@primer/view-components": "^0.37.0",
-    "@vercel/ncc": "^0.38.3",
+    "@actions/core": "^3.0.0",
+    "@primer/css": "^22.1.0",
+    "@primer/octicons": "^19.22.0",
+    "@primer/view-components": "^0.51.2",
+    "@vercel/ncc": "^0.38.4",
     "github-syntax-dark": "^0.5.0",
     "github-syntax-light": "^0.5.0",
-    "jsdom": "^26.0.0",
-    "pug": "^3.0.3",
-    "sass": "^1.85.0",
-    "typescript": "^5.7.3"
+    "jsdom": "^29.0.0",
+    "pug": "^3.0.4",
+    "sass": "^1.98.0",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@types/jsdom": "^21.1.7",
-    "@types/node": "^22.13.4",
-    "@types/primer__octicons": "^19.11.0",
+    "@types/jsdom": "^28.0.0",
+    "@types/node": "^25.5.0",
+    "@types/primer__octicons": "^19.21.0",
     "@types/pug": "^2.0.10",
-    "@typescript-eslint/eslint-plugin": "^8.24.1",
-    "@typescript-eslint/parser": "^8.24.1",
-    "eslint": "^9.20.1",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.3",
-    "prettier": "^3.5.1"
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "eslint": "^10.0.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.1"
   },
   "private": true
 }
