@@ -171,7 +171,7 @@ export async function renderFiles(
     };
     const renderedHTML: string = renderHTML(htmlConfig);
     const window = new Window();
-    window.document.documentElement.innerHTML = renderedHTML;
+    window.document.write(renderedHTML);
     const mdHeadings =
       window.document.getElementsByClassName('markdown-heading');
     for (const element of mdHeadings) {
@@ -184,7 +184,7 @@ export async function renderFiles(
       }
     }
     renderedFiles.push({
-      contents: window.document.documentElement.innerHTML,
+      contents: window.document.documentElement.outerHTML,
       outPath: titleSuffix,
     });
   }
