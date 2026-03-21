@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 
-import { JSDOM } from 'jsdom';
+import { Window } from 'happy-dom';
 import octicons from '@primer/octicons';
 import { LocalsObject, compile } from 'pug';
 
@@ -170,9 +170,10 @@ export async function renderFiles(
       customCSS: customCSS,
     };
     const renderedHTML: string = renderHTML(htmlConfig);
-    const dom = new JSDOM(renderedHTML);
+    const window = new Window();
+    window.document.documentElement.innerHTML = renderedHTML;
     const mdHeadings =
-      dom.window.document.getElementsByClassName('markdown-heading');
+      window.document.getElementsByClassName('markdown-heading');
     for (const element of mdHeadings) {
       for (const child of element.children) {
         if (child.tagName !== 'A') {
@@ -183,7 +184,7 @@ export async function renderFiles(
       }
     }
     renderedFiles.push({
-      contents: dom.serialize(),
+      contents: window.document.documentElement.innerHTML,
       outPath: titleSuffix,
     });
   }
