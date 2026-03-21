@@ -23,7 +23,7 @@ inputs:
     description: |
       Title of the path (default: username/repository)
 runs:
-  using: node20
+  using: node24
   main: dist/index.cjs
 branding:
   icon: book
