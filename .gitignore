@@ -1,5 +1,4 @@
 .idea/
-artifact
-node_modules
-lib
-local_dev
+node_modules/
+lib/
+out/

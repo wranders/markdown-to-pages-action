@@ -1,0 +1,6 @@
+--bind
+--container-daemon-socket ${DOCKER_HOST}
+--actor local_dev
+--env LOCAL_DEV=true
+--env GITHUB_REPOSITORY=wranders/markdown-to-pages-action
+--env GITHUB_SERVER_URL=https://github.com

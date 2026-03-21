@@ -14,9 +14,7 @@
     "url": "https://github.com/wranders/markdown-to-pages-action"
   },
   "scripts": {
-    "package": "just package",
-    "preact": "npm run package && node -e \"require('node:fs').mkdirSync('local_dev');\"",
-    "act": "act --rm --job=build --actor=wranders/local_dev --env-file=act/.env --secret=GITHUB_TOKEN=\"$(gh auth token)\" --artifact-server-path=artifact --container-options=\"-v ./local_dev:/local_dev:Z\""
+    "package": "just package"
   },
   "dependencies": {
     "@actions/core": "^3.0.0",
