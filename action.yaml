@@ -24,7 +24,7 @@ inputs:
       Title of the path (default: username/repository)
 runs:
   using: node20
-  main: dist/index.js
+  main: dist/index.cjs
 branding:
   icon: book
   color: purple

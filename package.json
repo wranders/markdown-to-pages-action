@@ -25,7 +25,7 @@
     "prebuild": "npm run clean && tsc --project scripts && node scripts/bin/bundle.js",
     "build": "tsc",
     "prepackage": "npm run build",
-    "package": "ncc build --minify --license licenses.txt",
+    "package": "esbuild --bundle --minify --platform=node --outfile=dist/index.cjs src/index.ts",
     "preact": "npm run package && node -e \"require('node:fs').mkdirSync('local_dev');\"",
     "act": "act --rm --job=build --actor=wranders/local_dev --env-file=act/.env --secret=GITHUB_TOKEN=\"$(gh auth token)\" --artifact-server-path=artifact --container-options=\"-v ./local_dev:/local_dev:Z\""
   },
@@ -34,7 +34,7 @@
     "@primer/css": "^22.1.0",
     "@primer/octicons": "^19.22.0",
     "@primer/view-components": "^0.51.2",
-    "@vercel/ncc": "^0.38.4",
+    "esbuild": "^0.27.4",
     "github-syntax-dark": "^0.5.0",
     "github-syntax-light": "^0.5.0",
     "jsdom": "^29.0.0",
