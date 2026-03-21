@@ -8,7 +8,7 @@
     "strict": true,
     "moduleResolution": "node",
     "rootDir": ".",
-    "outDir": "./bin",
+    "outDir": "../lib",
     "lib": [ "ESNext" ],
     "skipLibCheck": true
   }

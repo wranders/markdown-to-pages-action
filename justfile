@@ -10,7 +10,7 @@ clean +DIR:
 # compile typescript
 compile: (clean "artifact" "dist" "lib" "local_dev" "out" "scripts/bin" "imports")
     tsc --project scripts
-    node scripts/bin/bundle.js
+    node lib/bundle.js
     tsc
 
 # package cjs module
