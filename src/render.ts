@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 
-import { Window } from 'happy-dom';
+import { Window, XMLSerializer } from 'happy-dom';
 import octicons from '@primer/octicons';
 import { LocalsObject, compile } from 'pug';
 
@@ -183,8 +183,9 @@ export async function renderFiles(
         child.innerHTML = octicons.link.toSVG({ width: 16 });
       }
     }
+    const serializer = new XMLSerializer();
     renderedFiles.push({
-      contents: window.document.documentElement.outerHTML,
+      contents: serializer.serializeToString(window.document),
       outPath: titleSuffix,
     });
   }
