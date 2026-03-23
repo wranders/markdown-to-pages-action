@@ -57,131 +57,129 @@ function getInputs(): Inputs {
 }
 
 export async function main(): Promise<void> {
-  try {
-    // Gather inputs
-    const inputs = getInputs();
-    setSecret(inputs.token);
-    debug('inputs: ' + JSON.stringify(inputs));
+  // Gather inputs
+  const inputs = getInputs();
+  setSecret(inputs.token);
+  debug('inputs: ' + JSON.stringify(inputs));
 
-    // Resolve out path and check if existing files is permitted
-    inputs.outPath = resolve(inputs.outPath);
-    const outExists: boolean = existsSync(inputs.outPath);
-    if (!inputs.outPathNotEmpty) {
-      if (outExists && readdirSync(inputs.outPath).length !== 0) {
-        throw new Error(
-          `out_path '${inputs.outPath}' exists and is not empty.` +
-            // eslint-disable-next-line quotes
-            " set 'out_path_not_empty' to 'true' if needed.",
-        );
-      }
-    }
-    if (!outExists && inputs.outPathNotEmpty) {
-      info(
-        `out_path (${inputs.outPath}) does not exist ` +
-          'and out_path_not_empty is "true". ' +
-          'was this expected to exist? ' +
-          'creating out_path anyway...',
+  // Resolve out path and check if existing files is permitted
+  inputs.outPath = resolve(inputs.outPath);
+  const outExists: boolean = existsSync(inputs.outPath);
+  if (!inputs.outPathNotEmpty) {
+    if (outExists && readdirSync(inputs.outPath).length !== 0) {
+      throw new Error(
+        `out_path '${inputs.outPath}' exists and is not empty.` +
+          // eslint-disable-next-line quotes
+          " set 'out_path_not_empty' to 'true' if needed.",
       );
     }
-    mkdirSync(inputs.outPath, { recursive: true });
-    debug(`out_path '${inputs.outPath}' created`);
+  }
+  if (!outExists && inputs.outPathNotEmpty) {
+    info(
+      `out_path (${inputs.outPath}) does not exist ` +
+        'and out_path_not_empty is "true". ' +
+        'was this expected to exist? ' +
+        'creating out_path anyway...',
+    );
+  }
+  mkdirSync(inputs.outPath, { recursive: true });
+  debug(`out_path '${inputs.outPath}' created`);
 
-    const root: string = resolve('.');
+  const root: string = resolve('.');
 
-    // Check if files are provided. If not, default to README.md in root of repo
-    let files: string[] = inputs.files.split(/\r?\n/).filter((f) => f !== '');
-    if (files.length === 0) {
-      const readmes: string[] = readdirSync(root).filter((file) =>
-        // file.match(/readme/i),
-        /readme/i.exec(file),
-      );
-      if (readmes.length === 0) {
-        throw new Error('no files specified and no readme files found');
-      }
-      files = readmes;
+  // Check if files are provided. If not, default to README.md in root of repo
+  let files: string[] = inputs.files.split(/\r?\n/).filter((f) => f !== '');
+  if (files.length === 0) {
+    const readmes: string[] = readdirSync(root).filter((file) =>
+      // file.match(/readme/i),
+      /readme/i.exec(file),
+    );
+    if (readmes.length === 0) {
+      throw new Error('no files specified and no readme files found');
     }
+    files = readmes;
+  }
 
-    // Resolve paths of files and check if they exist
-    const filesToRender: FileToRender[] = [];
-    files.forEach((filename) => {
-      const absolute: string = resolve(filename);
-      if (!existsSync(absolute)) {
-        throw new Error(`file '${absolute}' does not exist`);
-      }
-      filesToRender.push({
-        path: filename,
-        absolutePath: absolute,
-      });
+  // Resolve paths of files and check if they exist
+  const filesToRender: FileToRender[] = [];
+  files.forEach((filename) => {
+    const absolute: string = resolve(filename);
+    if (!existsSync(absolute)) {
+      throw new Error(`file '${absolute}' does not exist`);
+    }
+    filesToRender.push({
+      path: filename,
+      absolutePath: absolute,
     });
+  });
 
-    if (inputs.customCSS.length !== 0) {
-      const file: string = join(root, inputs.customCSS);
-      if (!existsSync(file)) {
-        throw new Error(`custom css file '${file}' does not exist`);
-      }
+  if (inputs.customCSS.length !== 0) {
+    const file: string = join(root, inputs.customCSS);
+    if (!existsSync(file)) {
+      throw new Error(`custom css file '${file}' does not exist`);
     }
+  }
 
-    // Gather repository info
-    const repoInfo: RepositoryInfo = await getRepositoryInfo(
-      inputs.token,
-      process.env.GITHUB_REPOSITORY,
-    );
+  // Gather repository info
+  const repoInfo: RepositoryInfo = await getRepositoryInfo(
+    inputs.token,
+    process.env.GITHUB_REPOSITORY,
+  );
 
-    // Gather repository Github Pages info
-    const pagesInfo: PagesInfo = await getPagesInfo(
-      inputs.token,
-      process.env.GITHUB_REPOSITORY,
-    );
+  // Gather repository Github Pages info
+  const pagesInfo: PagesInfo = await getPagesInfo(
+    inputs.token,
+    process.env.GITHUB_REPOSITORY,
+  );
 
-    // Check if user or organization has a Twitter/X profile linked
-    const ownerSocials: OwnerSocial[] = await getOwnerSocials(
-      inputs.token,
-      repoInfo.owner.login,
-    );
-    const twitterHandle: string | undefined = getTwitterHandle(ownerSocials);
+  // Check if user or organization has a Twitter/X profile linked
+  const ownerSocials: OwnerSocial[] = await getOwnerSocials(
+    inputs.token,
+    repoInfo.owner.login,
+  );
+  const twitterHandle: string | undefined = getTwitterHandle(ownerSocials);
 
-    // Render each file
-    const renderedFiles: RenderedFile[] = await renderFiles(
-      inputs.token,
-      inputs.title,
-      repoInfo,
-      pagesInfo,
-      filesToRender,
-      twitterHandle,
-      inputs.customCSS,
-    );
+  // Render each file
+  const renderedFiles: RenderedFile[] = await renderFiles(
+    inputs.token,
+    inputs.title,
+    repoInfo,
+    pagesInfo,
+    filesToRender,
+    twitterHandle,
+    inputs.customCSS,
+  );
 
-    // Render custom 404
-    const renderedNotFound: RenderedFile = renderNotFound(
-      inputs.title,
-      repoInfo,
-      pagesInfo,
-      twitterHandle,
-    );
+  // Render custom 404
+  const renderedNotFound: RenderedFile = renderNotFound(
+    inputs.title,
+    repoInfo,
+    pagesInfo,
+    twitterHandle,
+  );
 
-    // Write each file
-    renderedFiles.forEach((file) => {
-      const fileOutDir: string = join(inputs.outPath, file.outPath);
-      if (!existsSync(fileOutDir)) {
-        mkdirSync(fileOutDir, { recursive: true });
-      }
-      writeFileSync(join(fileOutDir, 'index.html'), file.contents);
-    });
-    writeFileSync(join(inputs.outPath, '404.html'), renderedNotFound.contents);
-
-    // Render and write CSS
-    writeFileSync(join(inputs.outPath, 'index.css'), css);
-
-    // Copy custom CSS file to output
-    if (inputs.customCSS.length !== 0) {
-      copyFileSync(
-        join(root, inputs.customCSS),
-        join(inputs.outPath, 'custom.css'),
-      );
+  // Write each file
+  renderedFiles.forEach((file) => {
+    const fileOutDir: string = join(inputs.outPath, file.outPath);
+    if (!existsSync(fileOutDir)) {
+      mkdirSync(fileOutDir, { recursive: true });
     }
-  } catch (e) {
-    if (e instanceof Error) setFailed(e.message);
+    writeFileSync(join(fileOutDir, 'index.html'), file.contents);
+  });
+  writeFileSync(join(inputs.outPath, '404.html'), renderedNotFound.contents);
+
+  // Render and write CSS
+  writeFileSync(join(inputs.outPath, 'index.css'), css);
+
+  // Copy custom CSS file to output
+  if (inputs.customCSS.length !== 0) {
+    copyFileSync(
+      join(root, inputs.customCSS),
+      join(inputs.outPath, 'custom.css'),
+    );
   }
 }
 
-main();
+main().catch((e) => {
+  if (e instanceof Error) setFailed(e.message);
+});
