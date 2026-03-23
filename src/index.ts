@@ -87,7 +87,7 @@ export async function main(): Promise<void> {
 
   const root: string = resolve('.');
 
-  // Check if files are provided. If not, default to README.md in root of repo
+  // Check if files are provided. If not, default to README.md in the root of the repo
   let files: string[] = inputs.files.split(/\r?\n/).filter((f) => f !== '');
   if (files.length === 0) {
     const readmes: string[] = readdirSync(root).filter((file) =>
@@ -126,13 +126,13 @@ export async function main(): Promise<void> {
     process.env.GITHUB_REPOSITORY,
   );
 
-  // Gather repository Github Pages info
+  // Gather repository GitHub Pages info
   const pagesInfo: PagesInfo = await getPagesInfo(
     inputs.token,
     process.env.GITHUB_REPOSITORY,
   );
 
-  // Check if user or organization has a Twitter/X profile linked
+  // Check if the user or organization has a Twitter/X profile linked
   const ownerSocials: OwnerSocial[] = await getOwnerSocials(
     inputs.token,
     repoInfo.owner.login,
