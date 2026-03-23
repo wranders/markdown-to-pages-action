@@ -1,20 +1,7 @@
-import { debug, getInput, info, setFailed, setSecret } from '@actions/core';
-
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  writeFileSync,
-} from 'node:fs';
+import { setFailed } from '@actions/core';
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-
-import {
-  FileToRender,
-  RenderedFile,
-  renderFiles,
-  renderNotFound,
-} from './render';
+import { RenderedFile, renderFiles, renderNotFound } from './render';
 import {
   PagesInfo,
   RepositoryInfo,
@@ -22,8 +9,8 @@ import {
   getRepositoryInfo,
 } from './repo';
 import { OwnerSocial, getOwnerSocials, getTwitterHandle } from './social';
-
 import css from './imports/css';
+import { Inputs, getInputs } from './inputs';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -36,89 +23,9 @@ declare global {
   }
 }
 
-type Inputs = {
-  customCSS: string;
-  files: string;
-  outPath: string;
-  outPathNotEmpty: boolean;
-  title: string;
-  token: string;
-};
-
-function getInputs(): Inputs {
-  return {
-    customCSS: getInput('custom_css'),
-    files: getInput('files'),
-    outPath: getInput('out_path'),
-    outPathNotEmpty: getInput('out_path_not_empty') === 'true',
-    title: getInput('title'),
-    token: getInput('token', { required: true }),
-  };
-}
-
 export async function main(): Promise<void> {
   // Gather inputs
-  const inputs = getInputs();
-  setSecret(inputs.token);
-  debug('inputs: ' + JSON.stringify(inputs));
-
-  // Resolve out path and check if existing files is permitted
-  inputs.outPath = resolve(inputs.outPath);
-  const outExists: boolean = existsSync(inputs.outPath);
-  if (!inputs.outPathNotEmpty) {
-    if (outExists && readdirSync(inputs.outPath).length !== 0) {
-      throw new Error(
-        `out_path '${inputs.outPath}' exists and is not empty.` +
-          // eslint-disable-next-line quotes
-          " set 'out_path_not_empty' to 'true' if needed.",
-      );
-    }
-  }
-  if (!outExists && inputs.outPathNotEmpty) {
-    info(
-      `out_path (${inputs.outPath}) does not exist ` +
-        'and out_path_not_empty is "true". ' +
-        'was this expected to exist? ' +
-        'creating out_path anyway...',
-    );
-  }
-  mkdirSync(inputs.outPath, { recursive: true });
-  debug(`out_path '${inputs.outPath}' created`);
-
-  const root: string = resolve('.');
-
-  // Check if files are provided. If not, default to README.md in the root of the repo
-  let files: string[] = inputs.files.split(/\r?\n/).filter((f) => f !== '');
-  if (files.length === 0) {
-    const readmes: string[] = readdirSync(root).filter((file) =>
-      // file.match(/readme/i),
-      /readme/i.exec(file),
-    );
-    if (readmes.length === 0) {
-      throw new Error('no files specified and no readme files found');
-    }
-    files = readmes;
-  }
-
-  // Resolve paths of files and check if they exist
-  const filesToRender: FileToRender[] = [];
-  files.forEach((filename) => {
-    const absolute: string = resolve(filename);
-    if (!existsSync(absolute)) {
-      throw new Error(`file '${absolute}' does not exist`);
-    }
-    filesToRender.push({
-      path: filename,
-      absolutePath: absolute,
-    });
-  });
-
-  if (inputs.customCSS.length !== 0) {
-    const file: string = join(root, inputs.customCSS);
-    if (!existsSync(file)) {
-      throw new Error(`custom css file '${file}' does not exist`);
-    }
-  }
+  const inputs: Inputs = getInputs();
 
   // Gather repository info
   const repoInfo: RepositoryInfo = await getRepositoryInfo(
@@ -145,7 +52,7 @@ export async function main(): Promise<void> {
     inputs.title,
     repoInfo,
     pagesInfo,
-    filesToRender,
+    inputs.files,
     twitterHandle,
     inputs.customCSS,
   );
@@ -174,7 +81,7 @@ export async function main(): Promise<void> {
   // Copy custom CSS file to output
   if (inputs.customCSS.length !== 0) {
     copyFileSync(
-      join(root, inputs.customCSS),
+      join(resolve('.'), inputs.customCSS),
       join(inputs.outPath, 'custom.css'),
     );
   }
