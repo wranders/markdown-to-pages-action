@@ -12,7 +12,7 @@ import html from './imports/html';
 
 export type FileToRender = {
   path: string;
-  aboslutePath: string;
+  absolutePath: string;
 };
 
 export type RenderedFile = {
@@ -79,7 +79,7 @@ function replaceMarkdownLinks(
     const linkAbs: string = resolve(
       join(dirname(markdownFilePath), match.groups['filepath']),
     );
-    if (!filesToRender.some((f) => f.aboslutePath === linkAbs)) continue;
+    if (!filesToRender.some((f) => f.absolutePath === linkAbs)) continue;
     const linkTitle: string = match.groups['title'];
     let linkDir: string = dirname(linkAbs).replace(root, '');
     if (process.env.LOCAL_DEV === undefined) {
@@ -109,7 +109,7 @@ function generateBreadcrumbs(
     pathElements.forEach((value, index, array) => {
       const name: string = array.slice(0, index + 1).join(sep);
       const isRendered: boolean = filesToRender.some(
-        (f) => dirname(f.aboslutePath) === join(root, name),
+        (f) => dirname(f.absolutePath) === join(root, name),
       );
       if (!isRendered || index === array.length - 1) {
         out += ` > ${value}`;
@@ -137,13 +137,13 @@ export async function renderFiles(
   const renderedFiles: RenderedFile[] = [];
 
   for (const fileToRender of filesToRender) {
-    let fileContents: string = readFileSync(fileToRender.aboslutePath, {
+    let fileContents: string = readFileSync(fileToRender.absolutePath, {
       encoding: 'utf-8',
     });
     fileContents = replaceMarkdownLinks(
       filesToRender,
       fileContents,
-      fileToRender.aboslutePath,
+      fileToRender.absolutePath,
       pagesInfo,
     );
     const renderedMarkdown: string = await getRenderedMarkdown(

@@ -110,7 +110,7 @@ export async function main(): Promise<void> {
       }
       filesToRender.push({
         path: filename,
-        aboslutePath: absolute,
+        absolutePath: absolute,
       });
     });
 
