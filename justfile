@@ -15,7 +15,7 @@ compile: clean
 
 # package cjs module
 package: compile
-    esbuild --bundle --minify --platform=node \
+    esbuild --bundle --minify --platform=node --target=node24 \
         --outfile=dist/index.cjs \
         src/index.ts
 
