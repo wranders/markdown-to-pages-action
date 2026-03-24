@@ -6,18 +6,8 @@ const srcDir = resolve('src');
 const nodeModulesDir = resolve('node_modules');
 
 async function main(): Promise<void> {
-  // HTML
-  const htmlContents = readFileSync(join(srcDir, 'index.pug'), {
-    encoding: 'utf-8',
-  })
-    .replace(/`/g, '\\`')
-    .replace(/\$/g, '\\$');
-  const fileContents = `const html: string = \`${htmlContents}\`;
-export default html;
-`;
   const importsOutDir = join(srcDir, 'imports');
   if (!existsSync(importsOutDir)) mkdirSync(importsOutDir);
-  writeFileSync(join(importsOutDir, 'html.ts'), fileContents);
 
   // CSS
   const githubSyntaxDarkContents = readFileSync(

@@ -1,3 +1,5 @@
+/// <reference path="./global.d.ts" />
+
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 
@@ -8,7 +10,7 @@ import { LocalsObject, compile } from 'pug';
 import { PagesInfo, RepositoryInfo } from './repo';
 import { apiPost } from './request';
 
-import html from './imports/html';
+import template from './index.pug';
 
 export type FileToRender = {
   path: string;
@@ -58,7 +60,7 @@ function renderHTML(htmlConfig: HTML): string {
     localDev: process.env.LOCAL_DEV,
     customCSS: htmlConfig.customCSS,
   };
-  const compiler = compile(html);
+  const compiler = compile(template);
   return compiler(locals);
 }
 
