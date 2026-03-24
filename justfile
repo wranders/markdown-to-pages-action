@@ -14,11 +14,25 @@ compile: clean
     tsc
 
 # package cjs module
+[script("node")]
 package: compile
-    esbuild --bundle --minify --platform=node --target=node24 \
-        --loader:.pug=text \
-        --outfile=dist/index.cjs \
-        src/index.ts
+    var esbuild = require('{{justfile_directory()}}/node_modules/esbuild');
+    (async () => {
+      await esbuild.build({
+        entryPoints: [ 'src/index.ts' ],
+        outfile: 'dist/index.cjs',
+        bundle: true,
+        minify: true,
+        treeShaking: true,
+        format: 'cjs',
+        platform: 'node',
+        target: [ 'node24' ],
+        loader: {
+          '.pug': 'text'
+        },
+        logLevel: 'info'
+      });
+    })();
 
 # run pages workflow using nektos/act
 [linux]
