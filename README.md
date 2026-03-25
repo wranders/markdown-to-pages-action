@@ -15,11 +15,11 @@ which file should be that directory's `index.html`.
 
 ### `token`
 
-**Required:** A token is required to communicate with the Github API
+**Required:** A token is required to communicate with the GitHub API
 
 ### `custom_css`
 
-Path to a custom CSS file to override Github styles.
+Path to a custom CSS file to override GitHub styles.
 
 ### `files`
 
@@ -87,12 +87,12 @@ images, those directories will have to be copied to the `out-path` separately.
 
 This project is ***heavily*** inspired by
 [aleen42/markdown-only](https://github.com/aleen42/markdown-only). In fact, all
-of the rendered styling is based on their work. The motivation for this project
-was to not have to include all of the Jekyll files in repositories I wanted to
+the rendered styling is based on their work. The motivation for this project
+was to not have to include all the Jekyll files in repositories I wanted to
 use that Pages style for and leverage Actions.
 
-An improvement made here over the original project is that Github CSS is pulled
-from Github's published `npm` Node Packages instead of curated. The downside is
+An improvement made here over the original project is that GitHub CSS is pulled
+from GitHub's published `npm` Node Packages instead of curated. The downside is
 a larger stylesheet, though this may be addressed in a later release.
 
 ## Multi-page Demo
@@ -104,7 +104,7 @@ how multiple pages will be handled.
 
 ## Custom CSS Demo
 
-A custom CSS file is supported throught the [custom_css](#custom_css) option.
+A custom CSS file is supported through the [custom_css](#custom_css) option.
 In this example, the background color of code blocks within links is changed on
 hover.
 
