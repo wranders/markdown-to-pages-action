@@ -9,15 +9,19 @@ clean +DIR="dist lib out src/imports":
 
 # compile typescript
 compile: clean
-    tsc --project scripts
-    node lib/bundle.js
     tsc
 
 # package cjs module
 [script("node")]
 package: compile
-    var esbuild = require('{{justfile_directory()}}/node_modules/esbuild');
+    const esbuild = require('{{justfile_directory()}}/node_modules/esbuild');
     (async () => {
+      const css = await esbuild.build({
+        entryPoints: [ 'src/index.css' ],
+        bundle: true,
+        minify: true,
+        write: false
+      });
       await esbuild.build({
         entryPoints: [ 'src/index.ts' ],
         outfile: 'dist/index.cjs',
@@ -30,7 +34,10 @@ package: compile
         loader: {
           '.pug': 'text'
         },
-        logLevel: 'info'
+        logLevel: 'info',
+        define: {
+          'process.env.BUNDLED_CSS': JSON.stringify(css.outputFiles[0].text)
+        }
       });
     })();
 

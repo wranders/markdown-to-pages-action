@@ -1,5 +1,3 @@
-/// <reference path="./global.d.ts" />
-
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 

@@ -9,8 +9,9 @@ import {
   getRepositoryInfo,
 } from './repo';
 import { OwnerSocial, getOwnerSocials, getTwitterHandle } from './social';
-import css from './imports/css';
 import { Inputs, getInputs } from './inputs';
+
+const css = process.env.BUNDLED_CSS as string;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -19,6 +20,7 @@ declare global {
       GITHUB_REPOSITORY: string;
       GITHUB_SERVER_URL: string;
       LOCAL_DEV: string;
+      BUNDLED_CSS: string;
     }
   }
 }
