@@ -22,7 +22,7 @@ export function getInputs(): Inputs {
   const inputCustomCSS: string = getInput('custom_css');
   const inputFiles: string = getInput('files');
   const inputOutPathNotEmpty: boolean =
-      getInput('out_path_not_empty') === 'true';
+    getInput('out_path_not_empty') === 'true';
   const inputOutPath: string = getInput('out_path');
   const inputTitle: string = getInput('title');
   const inputToken: string = getInput('token', { required: true });
@@ -33,7 +33,7 @@ export function getInputs(): Inputs {
   // Validate use and ensure the existence of out_path
   const outPath: string = validateEnsureOutPath(
     inputOutPath,
-    inputOutPathNotEmpty
+    inputOutPathNotEmpty,
   );
 
   // Gather files to render
@@ -82,7 +82,8 @@ function validateEnsureOutPath(path: string, notEmpty: boolean): string {
   if (outExists && !notEmpty && readdirSync(outPath).length !== 0) {
     const msg: string =
       `out_path '${outPath}' already exists, is not empty, and using this` +
-      ` directory is not explicitly allowed with 'out_path_not_empty=true'.`;
+      // eslint-disable-next-line quotes
+      " directory is not explicitly allowed with 'out_path_not_empty=true'.";
     throw new Error(msg);
   }
   // If out_path does not exist and out_path_not_empty is true, notify the user
@@ -90,7 +91,7 @@ function validateEnsureOutPath(path: string, notEmpty: boolean): string {
   if (!outExists && notEmpty) {
     const msg: string =
       `out_path '${outPath}' does not exist and 'out_path_not_empty=true'.` +
-      ` was the directory expected to exist?` +
+      ' was the directory expected to exist?' +
       ` creating directory '${outPath}'...`;
     info(msg);
   }
@@ -112,14 +113,13 @@ function validateEnsureOutPath(path: string, notEmpty: boolean): string {
 function getFiles(inputFiles: string): FileToRender[] {
   // Input files are newline delimited, so split on newlines and filter out
   // empty lines.
-  let files: string[] = inputFiles
-      .split(/\r?\n/)
-      .filter((f) => f !== '');
+  let files: string[] = inputFiles.split(/\r?\n/).filter((f) => f !== '');
   // If no files were provided, search for a README file in the root directory.
   // Throw an error if no README file is found.
   if (files.length === 0) {
-    const readmes: string[] = readdirSync(resolve('.'))
-      .filter((f) => /readme/i.exec(f));
+    const readmes: string[] = readdirSync(resolve('.')).filter((f) =>
+      /readme/i.exec(f),
+    );
     if (readmes.length === 0) {
       throw new Error('no default readme file(s) found');
     }
@@ -154,4 +154,3 @@ function getCustomCSS(file: string): void {
     throw new Error(msg);
   }
 }
-
